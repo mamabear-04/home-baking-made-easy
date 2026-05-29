@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-warm-flour: #F9F7F2;
+  --color-crusty-sourdough: #C68E4B;
+  --color-herb-garden: #6B705C;
+  --color-slate-hearth: #2F2F2F;
+  --color-terracotta: #B5651D;
+
+  --font-serif: "Fraunces", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-warm-flour text-slate-hearth font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
