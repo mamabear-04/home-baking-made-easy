@@ -3,7 +3,6 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 
@@ -20,8 +19,8 @@ const orderRoutes = require('./routes/orders');
 const checkoutRoutes = require('./routes/checkout');
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), environment: 'production' });
 });
 
 app.use('/api/products', productRoutes);
@@ -29,6 +28,4 @@ app.use('/api/windows', windowRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/checkout', checkoutRoutes);
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`The Local Crumb Backend listening on http://0.0.0.0:${port}`);
-});
+module.exports = app;
