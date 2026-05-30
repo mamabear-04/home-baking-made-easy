@@ -20,11 +20,8 @@ router.post('/', express.raw({type: 'application/json'}), async (request, respon
 
   // Handle the event
   switch (event.type) {
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object;
-      
-      // Update order status in DB
-      // Note: We need to pass the orderId in metadata or client_reference_id
       const orderId = session.metadata.orderId;
       
       try {
@@ -37,6 +34,22 @@ router.post('/', express.raw({type: 'application/json'}), async (request, respon
         console.error('Error updating order status:', dbError);
       }
       break;
+    }
+    case 'checkout.session.expired': {
+      const session = event.data.object;
+      const orderId = session.metadata.orderId;
+      
+      try {
+        await db.execute({
+          sql: 'UPDATE orders SET status = "Cancelled" WHERE id = ?',
+          args: [orderId],
+        });
+        console.log(`Order ${orderId} marked as Cancelled (Session Expired)`);
+      } catch (dbError) {
+        console.error('Error marking order as cancelled:', dbError);
+      }
+      break;
+    }
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
