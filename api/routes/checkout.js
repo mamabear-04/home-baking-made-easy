@@ -5,7 +5,7 @@ const db = require('../db');
 const { v4: uuidv4 } = require('uuid');
 
 router.post('/create-checkout-session', async (req, res) => {
-  const { items, windowId, fulfillmentMethod, user_id } = req.body;
+  const { items, windowId, fulfillmentMethod, userId } = req.body;
   const orderId = uuidv4();
 
   try {
@@ -16,7 +16,7 @@ router.post('/create-checkout-session', async (req, res) => {
     // Primary order record
     queries.push({
       sql: 'INSERT INTO orders (id, user_id, window_id, total_amount, fulfillment_method, status) VALUES (?, ?, ?, ?, ?, ?)',
-      args: [orderId, user_id || 'guest', windowId, 0, fulfillmentMethod, 'Pending'],
+      args: [orderId, userId || 'guest', windowId, 0, fulfillmentMethod, 'Pending'],
     });
 
     for (const item of items) {
@@ -24,7 +24,7 @@ router.post('/create-checkout-session', async (req, res) => {
       totalAmount += price * item.quantity;
       queries.push({
         sql: 'INSERT INTO order_items (id, order_id, product_id, quantity, price_at_order) VALUES (?, ?, ?, ?, ?)',
-        args: [uuidv4(), orderId, item.product_id, item.quantity, price],
+        args: [uuidv4(), orderId, item.productId, item.quantity, price],
       });
     }
 
@@ -58,7 +58,7 @@ router.post('/create-checkout-session', async (req, res) => {
         orderId,
         windowId,
         fulfillmentMethod,
-        user_id: user_id || 'guest'
+        userId: userId || 'guest'
       },
     });
 

@@ -23,13 +23,21 @@ router.post('/', express.raw({type: 'application/json'}), async (request, respon
     case 'checkout.session.completed': {
       const session = event.data.object;
       const orderId = session.metadata.orderId;
+      const fulfillmentMethod = session.metadata.fulfillmentMethod;
       
       try {
-        await db.execute({
-          sql: 'UPDATE orders SET status = "Paid" WHERE id = ?',
-          args: [orderId],
-        });
-        console.log(`Order ${orderId} marked as Paid`);
+        if (fulfillmentMethod) {
+          await db.execute({
+            sql: 'UPDATE orders SET status = "Paid", fulfillment_method = ? WHERE id = ?',
+            args: [fulfillmentMethod, orderId],
+          });
+        } else {
+          await db.execute({
+            sql: 'UPDATE orders SET status = "Paid" WHERE id = ?',
+            args: [orderId],
+          });
+        }
+        console.log(`Order ${orderId} marked as Paid. Fulfillment: ${fulfillmentMethod || 'Default'}`);
       } catch (dbError) {
         console.error('Error updating order status:', dbError);
       }
